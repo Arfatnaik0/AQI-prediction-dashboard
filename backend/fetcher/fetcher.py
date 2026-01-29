@@ -1,6 +1,3 @@
-#API_key='74dcc4c2667120c8e4f27d2b7482d232'
-# redis="rediss://default:AXDaAAIncDJkMDY3YTVkYjE3NDg0ZjBiOTkzZjI1MTZmOWRmNDUwZnAyMjg4OTA@lucky-whippet-28890.upstash.io:6379"
-
 # import necessary libraries
 import requests
 import datetime
