@@ -28,4 +28,4 @@ jobs:
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
           REDIS_URL: ${{ secrets.REDIS_URL }}
         run: |
-          python backend/fetcher/fetch_once.py
+          python backend/fetcher/fetcher.py
