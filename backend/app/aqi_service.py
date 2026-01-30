@@ -25,7 +25,7 @@ def predict_from_redis():
 
     #check if enough data is present
     if len(df)<3:
-        return "Not enough data to predict AQI"
+        return None
     
     #prepare time features
     time=df['time'].iloc[-1]
@@ -83,6 +83,10 @@ def current_aqi():
 
     fetch_d=r.lrange("air_quality_history", -1, -1)
     fetch_d=[json.loads(x) for x in fetch_d]
+
+    if not fetch_d:
+        return None
+
     pm2_5=fetch_d[0]['pm2_5']
     pm10=fetch_d[0]['pm10']
 
