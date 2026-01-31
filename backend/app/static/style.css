@@ -157,6 +157,10 @@ body {
     width: 95%;
     padding: 0 16px;
   }
+
+  .footer{
+    margin-top: 6rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -226,6 +230,7 @@ body {
   .footer-inner p {
     font-size: 0.9rem;
   }
+
 }
 
 @media (max-width: 480px) {
@@ -246,6 +251,7 @@ body {
   .dashboard {
     padding: 10px;
     gap: 12px;
+    height: auto;
   }
 
   .column {
