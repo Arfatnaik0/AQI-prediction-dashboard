@@ -4,3 +4,4 @@ supabase
 pytz
 pandas
 joblib
+scikit-learn
