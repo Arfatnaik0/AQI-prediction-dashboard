@@ -1,26 +1,26 @@
-#import necessary libraries
 from flask import Flask, jsonify, render_template
 from supabase import create_client
 import os
-# import dotenv
-# dotenv.load_dotenv()
 
-# initialize Flask app and Supabase client
 app = Flask(__name__)
 
-supabase = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-)
+def get_supabase():
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-# default route
+    if not url or not key:
+        raise RuntimeError("Supabase environment variables not set")
+
+    return create_client(url, key)
+
 @app.route("/")
 def dashboard():
     return render_template("dashboard.html")
 
-# API route to get current AQI data
 @app.route("/api/current")
 def current():
+    supabase = get_supabase()
+
     res = (
         supabase.table("aqi_history")
         .select("*")
@@ -28,18 +28,23 @@ def current():
         .limit(1)
         .execute()
     )
+
     return jsonify(res.data[0])
 
-# API route to get historical AQI data
 @app.route("/api/history")
 def history():
+    supabase = get_supabase()
+
     res = (
         supabase.table("aqi_history")
-        .select("timestamp_utc,pm2_5,pm10,current_aqi,predicted_aqi_3h")
+        .select(
+            "timestamp_utc,pm2_5,pm10,current_aqi,predicted_aqi_3h"
+        )
         .order("timestamp_utc")
         .execute()
     )
+
     return jsonify(res.data)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
