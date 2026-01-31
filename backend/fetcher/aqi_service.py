@@ -15,7 +15,11 @@ import os
 #load model and redis connection
 REDIS_URL = os.getenv("REDIS_URL")
 r=redis.Redis.from_url(REDIS_URL, decode_responses=True)
-model=joblib.load('../model/rf_aqi_model.pkl')
+
+# load model
+base_dir=os.path.dirname(os.path.abspath(__file__))
+model_path=os.path.join(base_dir, '..', 'model', 'rf_aqi_model.pkl')
+model=joblib.load(model_path)
 
 #function to extract data from redis and make prediction
 def extract_from_redis():
