@@ -1,9 +1,16 @@
+#import necessary libraries
 from flask import Flask, jsonify, render_template
 from supabase import create_client
 import os
 
+# for local testing
+# import dotenv
+# dotenv.load_dotenv()
+
+
 app = Flask(__name__)
 
+# Function to initialize and return Supabase client
 def get_supabase():
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
@@ -13,10 +20,12 @@ def get_supabase():
 
     return create_client(url, key)
 
+# Default route to render the dashboard
 @app.route("/")
 def dashboard():
     return render_template("dashboard.html")
 
+# route for most recent data
 @app.route("/api/current")
 def current():
     supabase = get_supabase()
@@ -31,6 +40,7 @@ def current():
 
     return jsonify(res.data[0])
 
+# route for historical data
 @app.route("/api/history")
 def history():
     supabase = get_supabase()
