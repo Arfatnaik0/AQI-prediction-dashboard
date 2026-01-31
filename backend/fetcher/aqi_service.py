@@ -124,5 +124,3 @@ def extract_from_redis():
         
     }
     return data
-
-print(extract_from_redis())
