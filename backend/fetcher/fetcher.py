@@ -8,9 +8,9 @@ from supabase import create_client
 from aqi_service import extract_from_redis
 
 # for local development use dotenv to load environment variables
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 # load environment variables
-load_dotenv()
+# load_dotenv()
 
 # lat and lon for Mumbai
 LAT = 18.9766
