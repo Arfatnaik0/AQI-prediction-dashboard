@@ -1,0 +1,8 @@
+requests
+redis
+supabase
+pytz
+pandas
+joblib
+scikit-learn
+flask

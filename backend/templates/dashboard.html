@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AtmosIQ</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-left"></div>
+    <div class="nav-mid">AtmosIQ</div>
+    <div class="nav-right">
+      <a href="https://github.com/Arfatnaik0/AtmosIQ" target="_blank">GitHub</a>
+      <a href="https://personal-portfolio-arfat.vercel.app/" target="_blank">Portfolio</a>
+    </div>
+  </nav>
+  <main class="dashboard">
+    <section class="column left">
+      <div class="card">
+        <h3>PM2.5 History</h3>
+        <canvas id="pm25Chart"></canvas>
+      </div>
+
+      <div class="card">
+        <h3>PM10 History</h3>
+        <canvas id="pm10Chart"></canvas>
+      </div>
+    </section>
+    <section class="column right">
+      <div class="card aqi-card">
+        <div class="aqi-header">Current AQI</div>
+
+        <div class="aqi-main">
+          <span id="currentAQI" class="aqi-value">--</span>
+          <span id="aqiCategory" class="aqi-category">--</span>
+        </div>
+
+        <div class="aqi-sub">
+          <div class="aqi-sub-item">
+            <span class="label">Predicted (3h ago)</span>
+            <span id="predictedNow" class="value">--</span>
+          </div>
+
+          <div class="aqi-sub-item">
+            <span class="label">Difference</span>
+            <span id="aqiDelta" class="value">--</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card aqi">
+        <h3>AQI (Past 24h + 3h Forecast)</h3>
+        <canvas id="aqiChart"></canvas>
+      </div>
+    </section>
+
+  </main>
+  <div class="footer">
+        <div class="footer-inner">
+            <p>Built by Arfat Naik</p>
+        </div>
+    </div>
+    </div>
+    </div>
+
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
