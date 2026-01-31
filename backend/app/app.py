@@ -2,8 +2,8 @@
 from flask import Flask, jsonify, render_template
 from supabase import create_client
 import os
-# import dotenv
-# dotenv.load_dotenv()
+import dotenv
+dotenv.load_dotenv()
 
 # initialize Flask app and Supabase client
 app = Flask(__name__)
