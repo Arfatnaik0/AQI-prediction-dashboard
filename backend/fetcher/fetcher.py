@@ -4,6 +4,13 @@ import datetime
 import redis
 import json
 import os
+from supabase import create_client
+from aqi_service import extract_from_redis
+
+# for local development use dotenv to load environment variables
+from dotenv import load_dotenv
+# load environment variables
+load_dotenv()
 
 # lat and lon for Mumbai
 LAT = 18.9766
@@ -12,6 +19,11 @@ LON = 72.8338
 # load environment variables
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 REDIS_URL = os.getenv("REDIS_URL")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+# create supabase client
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # check for required environment variables
 if not OPENWEATHER_API_KEY or not REDIS_URL:
@@ -63,7 +75,20 @@ def fetch_and_store():
     # keep only last 3 readings
     r.ltrim(REDIS_KEY, -MAX_HOURS, -1)
 
+redis_data = extract_from_redis()
+
+def store_to_supabase(timestamp_utc, pm25, pm10, current_aqi, predicted_aqi):
+    supabase.table("aqi_history").insert({
+        "timestamp_utc": timestamp_utc,
+        "pm2_5": pm25,
+        "pm10": pm10,
+        "current_aqi": current_aqi,
+        "predicted_aqi_3h": predicted_aqi
+    }).execute()
+
+
 if __name__ == "__main__":
     fetch_and_store()
+    store_to_supabase(redis_data['datetime'],redis_data['pm2_5'],redis_data['pm10'],redis_data['current_aqi'], redis_data['predicted_aqi'])
 
 

@@ -6,8 +6,9 @@ import pytz
 import pandas as pd
 import joblib
 import os
-from dotenv import load_dotenv
 
+# for local development use dotenv to load environment variables
+from dotenv import load_dotenv
 #load environment variables
 load_dotenv()
 
@@ -16,8 +17,8 @@ REDIS_URL = os.getenv("REDIS_URL")
 r=redis.Redis.from_url(REDIS_URL, decode_responses=True)
 model=joblib.load('../model/rf_aqi_model.pkl')
 
-#predictor function
-def predict_from_redis():
+#function to extract data from redis and make prediction
+def extract_from_redis():
     #fetch data from redis
     fetch_d=r.lrange("air_quality_history", 0, -1)
     fetch_d=[json.loads(x) for x in fetch_d]
@@ -54,15 +55,16 @@ def predict_from_redis():
         'PM10(rolling_mean_3)':round(float(df['pm10'].iloc[-3:].mean()), 2)
     }
 
+    #extact dt,pm25,pm10
+    datet=dt
+    pm25=data['PM2_5']
+    pm10=data['PM10']
+
     #make prediction
     data=pd.DataFrame([data])
     prediction=model.predict(data)
     prediction=round(prediction[0])
-    return prediction
 
-
-
-def current_aqi():
     PM25_BP = [
     (0, 30, 0, 50),
     (31, 60, 51, 100),
@@ -108,7 +110,15 @@ def current_aqi():
     PM25=calculate_sub_i(pm2_5, PM25_BP)
     PM10=calculate_sub_i(pm10, PM10_BP)
     aqi=max(PM25, PM10)
-    return round(aqi)
 
-print(current_aqi())
-print(predict_from_redis())
+    data={
+        'datetime': datet.strftime("%Y-%m-%d %H:%M:%S"),
+        'pm2_5': pm25,
+        'pm10': pm10,
+        'current_aqi': round(aqi),
+        'predicted_aqi': prediction
+        
+    }
+    return data
+
+print(extract_from_redis())
