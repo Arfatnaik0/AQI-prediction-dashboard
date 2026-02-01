@@ -13,10 +13,9 @@ async function renderDashboard() {
   const history = await fetchHistory();
   if (!history || history.length < 4) return;
 
-  const labels = history.map(d => {
-    const t = new Date(d.timestamp_utc);
-    return t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  });
+const labels = history.map(d => {
+  return d.timestamp_utc.slice(11, 16);
+});
 
   const pm25 = history.map(d => d.pm2_5);
   const pm10 = history.map(d => d.pm10);
@@ -49,14 +48,23 @@ async function renderDashboard() {
   deltaEl.style.color = Math.abs(delta) <= 15 ? "#22c55e" : "#ef4444";
 
   /* Forecast chart logic */
+  const lastActual = historyAQI[historyAQI.length - 1];
   const futureAQI = history.slice(-3).map(d => d.predicted_aqi_3h);
   const extendedLabels = [...labels, "+1h", "+2h", "+3h"];
 
-  const aqiHistoryLine = historyAQI.concat([null, null, null]);
-  const aqiForecastLine =
-    new Array(historyAQI.length - 1).fill(null)
-      .concat([historyAQI[historyAQI.length - 1]])
-      .concat(futureAQI);
+  const aqiHistoryLine = [
+  ...historyAQI,
+  null,
+  null,
+  null
+];
+
+
+const aqiForecastLine = [
+  ...new Array(historyAQI.length - 1).fill(null),
+  lastActual,        // bridge point at +1h
+  ...futureAQI
+];
 
   if (pm25ChartInstance) pm25ChartInstance.destroy();
   if (pm10ChartInstance) pm10ChartInstance.destroy();
@@ -85,16 +93,25 @@ async function renderDashboard() {
   });
 
   aqiChartInstance = new Chart(aqiChart, {
-    type: "line",
-    data: {
-      labels: extendedLabels,
-      datasets: [
-        { data: aqiHistoryLine, borderColor: "#ef4444", tension: 0.35 },
-        { data: aqiForecastLine, borderColor: "#22c55e", borderDash: [6,6], tension: 0.35 }
-      ]
-    },
-    options: commonOptions
-  });
+  type: "line",
+  data: {
+    labels: extendedLabels,
+    datasets: [
+      {
+        data: aqiHistoryLine,
+        borderColor: "#ef4444",
+        tension: 0.35
+      },
+      {
+        data: aqiForecastLine,
+        borderColor: "#22c55e",
+        borderDash: [6,6],
+        tension: 0.35
+      }
+    ]
+  },
+  options: commonOptions
+});
 }
 
 renderDashboard();
