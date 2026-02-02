@@ -75,8 +75,6 @@ def fetch_and_store():
     # keep only last 3 readings
     r.ltrim(REDIS_KEY, -MAX_HOURS, -1)
 
-redis_data = extract_from_redis()
-
 def store_to_supabase(timestamp_utc, pm25, pm10, current_aqi, predicted_aqi):
     supabase.table("aqi_history").insert({
         "timestamp_utc": timestamp_utc,
@@ -89,6 +87,5 @@ def store_to_supabase(timestamp_utc, pm25, pm10, current_aqi, predicted_aqi):
 
 if __name__ == "__main__":
     fetch_and_store()
+    redis_data = extract_from_redis()
     store_to_supabase(redis_data['datetime'],redis_data['pm2_5'],redis_data['pm10'],redis_data['current_aqi'], redis_data['predicted_aqi'])
-
-
