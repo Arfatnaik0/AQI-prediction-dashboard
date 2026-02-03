@@ -8,9 +8,9 @@ import joblib
 import os
 
 # for local development use dotenv to load environment variables
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 #load environment variables
-load_dotenv()
+# load_dotenv()
 
 #load model and redis connection
 REDIS_URL = os.getenv("REDIS_URL")
