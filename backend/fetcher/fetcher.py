@@ -75,7 +75,28 @@ def fetch_and_store():
     # keep only last 3 readings
     r.ltrim(REDIS_KEY, -MAX_HOURS, -1)
 
-def store_to_supabase(timestamp_utc, pm25, pm10, current_aqi, predicted_aqi):
+def store_for_updating_model(timestamp_utc, ws_ms, wd_deg, month, hour_of_day, temperature, humidity, pm25, pm10, pm25_lag1, pm25_lag2, pm10_lag1, pm10_lag2, pm25_rm3, pm10_rm3, current_aqi, predicted_aqi):
+    supabase.table("aqi_history_all_features").insert({
+        "timestamp_utc": timestamp_utc,
+        "ws_ms": ws_ms,
+        "wd_deg": wd_deg,
+        "month": month,
+        "hour_of_day": hour_of_day,
+        "temperature": temperature,
+        "humidity": humidity,
+        "pm25": pm25,
+        "pm10": pm10,
+        "pm25_lag1": pm25_lag1,
+        "pm25_lag2": pm25_lag2,
+        "pm10_lag1": pm10_lag1,
+        "pm10_lag2": pm10_lag2,
+        "pm25_rm3": pm25_rm3,
+        "pm10_rm3": pm10_rm3,
+        "current_aqi": current_aqi,
+        "predicted_aqi_3h": predicted_aqi
+    }).execute()
+
+def store_for_app(timestamp_utc, pm25, pm10, current_aqi, predicted_aqi):
     supabase.table("aqi_history").insert({
         "timestamp_utc": timestamp_utc,
         "pm2_5": pm25,
@@ -88,4 +109,5 @@ def store_to_supabase(timestamp_utc, pm25, pm10, current_aqi, predicted_aqi):
 if __name__ == "__main__":
     fetch_and_store()
     redis_data = extract_from_redis()
-    store_to_supabase(redis_data['datetime'],redis_data['pm2_5'],redis_data['pm10'],redis_data['current_aqi'], redis_data['predicted_aqi'])
+    store_for_updating_model(redis_data['datetime'],redis_data['WS (m/s)'],redis_data['WD (deg)'],redis_data['month'],redis_data['hourofday'],redis_data['temp'],redis_data['humidity'],redis_data['PM2_5'],redis_data['PM10'],redis_data['PM2_5(lag1)'],redis_data['PM2_5(lag2)'],redis_data['PM10(lag1)'],redis_data['PM10(lag2)'],redis_data['PM2_5(rolling_mean_3)'],redis_data['PM10(rolling_mean_3)'],redis_data['current_aqi'], redis_data['predicted_aqi'])
+    store_for_app(redis_data['datetime'], redis_data['PM2_5'], redis_data['PM10'], redis_data['current_aqi'], redis_data['predicted_aqi'])

@@ -27,6 +27,7 @@ def extract_from_redis():
     fetch_d=r.lrange("air_quality_history", 0, -1)
     fetch_d=[json.loads(x) for x in fetch_d]
     df=pd.DataFrame(fetch_d)
+    print(df)
 
     #check if enough data is present
     if len(df)<3:
@@ -35,11 +36,10 @@ def extract_from_redis():
     #prepare time features
     time=df['time'].iloc[-1]
     dt_utc = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-    dt_utc = pytz.utc.localize(dt_utc)
-    ist = pytz.timezone("Asia/Kolkata")
-    dt = dt_utc.astimezone(ist)
+    dt= pytz.utc.localize(dt_utc)
     month=dt.month
     hour=dt.hour
+    print(month, hour)
 
     #prepare data for prediction
     data={
@@ -61,8 +61,6 @@ def extract_from_redis():
 
     #extact dt,pm25,pm10
     datet=dt
-    pm25=data['PM2_5']
-    pm10=data['PM10']
 
     #make prediction
     data=pd.DataFrame([data])
@@ -117,10 +115,21 @@ def extract_from_redis():
 
     data={
         'datetime': datet.strftime("%Y-%m-%d %H:%M:%S"),
-        'pm2_5': pm25,
-        'pm10': pm10,
+        'WS (m/s)':float(df['windS'].iloc[-1]),
+        'WD (deg)':float(df['windD'].iloc[-1]),
+        'month':month,
+        'hourofday':hour,
+        'PM2_5':float(df['pm2_5'].iloc[-1]),
+        'PM10':float(df['pm10'].iloc[-1]),
+        'temp':float(df['temp'].iloc[-1]),
+        'humidity':float(df['humidity'].iloc[-1]),
+        'PM2_5(lag1)':float(df['pm2_5'].iloc[-2]),
+        'PM2_5(lag2)':float(df['pm2_5'].iloc[-3]),
+        'PM10(lag1)':float(df['pm10'].iloc[-2]),
+        'PM10(lag2)':float(df['pm10'].iloc[-3]),
+        'PM2_5(rolling_mean_3)':round(float(df['pm2_5'].iloc[-3:].mean()), 2),
+        'PM10(rolling_mean_3)':round(float(df['pm10'].iloc[-3:].mean()), 2),
         'current_aqi': round(aqi),
         'predicted_aqi': prediction
-        
     }
     return data
