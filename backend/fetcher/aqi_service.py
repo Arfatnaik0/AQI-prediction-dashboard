@@ -8,9 +8,9 @@ import joblib
 import os
 
 # for local development use dotenv to load environment variables
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 #load environment variables
-# load_dotenv()
+load_dotenv()
 
 #load model and redis connection
 REDIS_URL = os.getenv("REDIS_URL")
@@ -27,7 +27,6 @@ def extract_from_redis():
     fetch_d=r.lrange("air_quality_history", 0, -1)
     fetch_d=[json.loads(x) for x in fetch_d]
     df=pd.DataFrame(fetch_d)
-    print(df)
 
     #check if enough data is present
     if len(df)<3:
@@ -36,10 +35,12 @@ def extract_from_redis():
     #prepare time features
     time=df['time'].iloc[-1]
     dt_utc = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-    dt= pytz.utc.localize(dt_utc)
+    dt_utc = pytz.utc.localize(dt_utc)
+    ist = pytz.timezone("Asia/Kolkata")
+    dt = dt_utc.astimezone(ist)
     month=dt.month
     hour=dt.hour
-    print(month, hour)
+
 
     #prepare data for prediction
     data={
@@ -133,3 +134,4 @@ def extract_from_redis():
         'predicted_aqi': prediction
     }
     return data
+extract_from_redis()
